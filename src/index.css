@@ -1,3 +1,6 @@
+@import './styles/_variables.scss';
+@import './styles/_keyframe-animations.scss';
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -86,5 +89,69 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  .tiptap {
+    @apply text-[0.95rem] leading-7 text-foreground outline-none;
+  }
+
+  .tiptap>*:first-child {
+    @apply mt-0;
+  }
+
+  .tiptap h1 {
+    @apply mt-6 scroll-m-20 text-3xl font-semibold tracking-tight;
+  }
+
+  .tiptap h2 {
+    @apply mt-5 scroll-m-20 text-2xl font-semibold tracking-tight;
+  }
+
+  .tiptap h3 {
+    @apply mt-4 scroll-m-20 text-xl font-semibold;
+  }
+
+  .tiptap p {
+    @apply my-3;
+  }
+
+  .tiptap ul {
+    @apply my-3 list-disc pl-6;
+  }
+
+  .tiptap ol {
+    @apply my-3 list-decimal pl-6;
+  }
+
+  .tiptap blockquote {
+    @apply my-4 border-l-2 border-border pl-4 text-muted-foreground;
+  }
+
+  .tiptap pre {
+    @apply my-4 overflow-x-auto rounded-lg bg-muted/70 p-4 text-sm;
+  }
+
+  .tiptap code {
+    @apply rounded bg-muted/70 px-1.5 py-0.5 font-mono text-sm;
+  }
+
+  .tiptap a {
+    @apply underline decoration-muted-foreground/60 underline-offset-4;
+  }
+
+  .tiptap table {
+    @apply my-4 w-full border-collapse;
+  }
+
+  .tiptap th {
+    @apply border border-border bg-muted/50 px-3 py-2 text-left text-sm font-medium;
+  }
+
+  .tiptap td {
+    @apply border border-border px-3 py-2 align-top text-sm;
+  }
+
+  .tiptap img {
+    @apply my-4 rounded-lg border border-border;
   }
 }
