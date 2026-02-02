@@ -10,6 +10,8 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 import { getBreadcrumbs } from "@/lib/navigation"
 import {
@@ -22,27 +24,113 @@ import {
 } from "@/components/ui/breadcrumb"
 
 function EditorPage({ pageTitle }: { pageTitle: string }) {
+  const versionHistory = [
+    {
+      id: "v1.6",
+      label: "Autosave",
+      time: "2 minutes ago",
+      status: "Draft",
+    },
+    {
+      id: "v1.5",
+      label: "Saved",
+      time: "Today, 10:42",
+      status: "Draft",
+    },
+    {
+      id: "v1.4",
+      label: "Published",
+      time: "Yesterday, 18:05",
+      status: "Live",
+    },
+    {
+      id: "v1.3",
+      label: "Saved",
+      time: "Jan 28, 09:12",
+      status: "Draft",
+    },
+  ]
+
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <main className="min-w-0 flex-1 space-y-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              Page editor
-            </p>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {pageTitle}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Draft · Last saved 2 minutes ago
-            </p>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-background lg:flex-row">
+        <section className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-auto">
+            <SimpleEditor />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="secondary">Save draft</Button>
-            <Button>Publish</Button>
+        </section>
+
+        <Separator orientation="horizontal" className="lg:hidden" />
+        <Separator orientation="vertical" className="hidden lg:block" />
+
+        <aside className="flex min-h-0 w-full flex-col overflow-auto lg:w-[320px] xl:w-[360px]">
+          <div className="sticky top-0 z-10 border-b bg-background/95 px-4 py-3 backdrop-blur">
+            <div className="flex items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  Editor
+                </p>
+                <h2 className="text-sm font-semibold">Settings</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" size="sm">
+                  Save draft
+                </Button>
+                <Button size="sm">Publish</Button>
+              </div>
+            </div>
+            <div className="mt-3 space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">
+                  Title
+                </label>
+                <Input defaultValue={pageTitle} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">
+                  Slug
+                </label>
+                <Input defaultValue="page-slug" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">
+                  Summary
+                </label>
+                <Textarea
+                  rows={3}
+                  placeholder="Short description for listings and previews."
+                />
+              </div>
+            </div>
           </div>
-        </div>
-        <SimpleEditor />
+
+          <div className="flex-1 p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Version history</h3>
+              <Button variant="ghost" size="sm">
+                View all
+              </Button>
+            </div>
+            <div className="mt-3 space-y-2">
+              {versionHistory.map((version) => (
+                <div
+                  key={version.id}
+                  className="rounded-lg border border-border/60 px-3 py-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">{version.id}</p>
+                    <span className="text-xs text-muted-foreground">
+                      {version.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {version.label} · {version.time}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
       </main>
     </div>
   )
@@ -60,7 +148,7 @@ export default function App() {
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
+
           <Breadcrumb>
             <BreadcrumbList>
               {breadcrumbs.map((crumb, index) => {
