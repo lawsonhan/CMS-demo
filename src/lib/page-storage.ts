@@ -124,6 +124,30 @@ export function createPage(input: CreatePageInput): PageData {
                     }
                 ]
             }
+        } else if (input.slug === "mission") {
+            content = {
+                type: "doc",
+                content: [
+                    {
+                        type: "heading",
+                        attrs: { level: 3 },
+                        content: [{ type: "text", text: "辦學宗旨" }]
+                    },
+                    {
+                        type: "paragraph",
+                        content: [{ type: "text", text: "本校秉承校訓「勤、慎、禮、儉」的精神，為學生提供優質的全人教育。我們致力培養學生在德、智、體、群、美五育方面的均衡發展，啟發學生的潛能，協助他們建立正確的價值觀和積極的人生觀，使他們將來成為對社會有貢獻的良好公民。" }]
+                    },
+                    {
+                        type: "heading",
+                        attrs: { level: 3 },
+                        content: [{ type: "text", text: "學校願景" }]
+                    },
+                    {
+                        type: "paragraph",
+                        content: [{ type: "text", text: "我們期望建立一所充滿關愛、互相尊重、乐於學習的校園。教師專業進修，追求卓越；家長與學校緊密合作，共同培育幼苗；學生愉快學習，盡展所長。" }]
+                    }
+                ]
+            }
         }
     }
 

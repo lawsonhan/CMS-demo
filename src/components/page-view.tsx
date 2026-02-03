@@ -22,6 +22,8 @@ import { HomeTemplate } from "@/components/templates/home-template"
 import { CalendarTemplate } from "@/components/templates/calendar-template"
 import { ContactTemplate } from "@/components/templates/contact-template"
 
+import { StandardTemplate } from "@/components/templates/standard-template"
+
 interface PageViewProps {
     page: PageData
     onEdit?: () => void
@@ -60,7 +62,7 @@ export function PageView({ page }: PageViewProps) {
 
     // Template Selection Logic
     if (page.slug === 'home' || page.slug === '') {
-        return <HomeTemplate page={page} editor={editor} />
+        return <HomeTemplate editor={editor} />
     }
 
     if (page.slug === 'calendar') {
@@ -71,21 +73,25 @@ export function PageView({ page }: PageViewProps) {
         return <ContactTemplate page={page} editor={editor} />
     }
 
-    if (!editor) {
-        return null
-    }
-
-    return (
-        <div className="flex min-h-0 flex-1 flex-col bg-background">
-            {/* Page Content */}
-            <div className="flex-1 overflow-auto">
-                <div className="container max-w-4xl mx-auto px-4 py-8 lg:px-8 lg:py-12">
-                    {/* Re-using the editor styling wrapper but without the toolbar layout */}
-                    <div className="simple-editor-wrapper tiptap-theme !border-none !h-auto">
-                        <EditorContent editor={editor} className="simple-editor-content" />
+    // Skipped categories (use default for now, or standard if desired, but user said skip)
+    // "school-booklet", "activity-photos", "announcements"
+    const skippedSlugs = ["school-booklet", "activity-photos", "announcements"]
+    if (skippedSlugs.includes(page.slug)) {
+        // Fallback to simple view or minimal template
+        if (!editor) return null
+        return (
+            <div className="flex min-h-0 flex-1 flex-col bg-background">
+                <div className="flex-1 overflow-auto">
+                    <div className="container max-w-4xl mx-auto px-4 py-8 lg:px-8 lg:py-12">
+                        <div className="simple-editor-wrapper tiptap-theme !border-none !h-auto">
+                            <EditorContent editor={editor} className="simple-editor-content" />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
+
+    // Default to Standard Template for all other pages (sub-menus)
+    return <StandardTemplate page={page} editor={editor} />
 }

@@ -412,3 +412,22 @@ export function getTitleByUrl(url: string): string {
   const breadcrumbs = getBreadcrumbs(url)
   return breadcrumbs[breadcrumbs.length - 1]?.title || "Page"
 }
+
+/**
+ * Get the section menu for a given URL (finds the top-level parent in navMain)
+ */
+export function getSectionMenu(url: string): NavItem | null {
+  const normalized = normalizePath(url)
+
+  // Only look in navMain (not quickLinks)
+  for (const section of navigation.navMain) {
+    if (section.url && normalizePath(section.url) === normalized) {
+      return section
+    }
+    // Check if any descendant matches
+    if (section.items && isNavItemActive(section, url)) {
+      return section
+    }
+  }
+  return null
+}

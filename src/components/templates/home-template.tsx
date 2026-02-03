@@ -1,10 +1,8 @@
 import { EditorContent, type Editor } from "@tiptap/react"
-import type { PageData } from "@/lib/page-types"
 import { ArrowRight, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface HomeTemplateProps {
-    page: PageData
     editor: Editor | null
 }
 
