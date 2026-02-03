@@ -237,7 +237,7 @@ export function SimpleEditor() {
   }, [isMobile, mobileView])
 
   return (
-    <div className="simple-editor-wrapper">
+    <div className="simple-editor-wrapper tiptap-theme">
       <EditorContext.Provider value={{ editor }}>
         <Toolbar
           ref={toolbarRef}

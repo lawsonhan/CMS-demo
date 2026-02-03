@@ -53,9 +53,9 @@ function EditorPage({ pageTitle }: { pageTitle: string }) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <main className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-background lg:flex-row">
+      <main className="flex min-h-0 flex-1 flex-col rounded-lg bg-background lg:flex-row">
         <section className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 overflow-auto">
+          <div className="min-h-0 flex-1">
             <SimpleEditor />
           </div>
         </section>
@@ -63,7 +63,7 @@ function EditorPage({ pageTitle }: { pageTitle: string }) {
         <Separator orientation="horizontal" className="lg:hidden" />
         <Separator orientation="vertical" className="hidden lg:block" />
 
-        <aside className="flex min-h-0 w-full flex-col overflow-auto lg:w-[320px] xl:w-[360px]">
+        <aside className="flex min-h-0 w-full flex-col lg:sticky lg:top-0 lg:max-h-svh lg:w-[320px] lg:self-start lg:overflow-hidden xl:w-[360px]">
           <div className="sticky top-0 z-10 border-b bg-background/95 px-4 py-3 backdrop-blur">
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-0.5">
@@ -104,14 +104,14 @@ function EditorPage({ pageTitle }: { pageTitle: string }) {
             </div>
           </div>
 
-          <div className="flex-1 p-4">
+          <div className="flex min-h-0 flex-1 flex-col p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold">Version history</h3>
               <Button variant="ghost" size="sm">
                 View all
               </Button>
             </div>
-            <div className="mt-3 space-y-2">
+            <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-auto">
               {versionHistory.map((version) => (
                 <div
                   key={version.id}
