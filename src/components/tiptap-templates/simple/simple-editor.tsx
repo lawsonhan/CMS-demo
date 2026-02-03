@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import type { JSONContent } from "@tiptap/react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
 
 // --- Tiptap Core Extensions ---
@@ -72,7 +73,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
-import content from "@/components/tiptap-templates/simple/data/content.json"
+// Removed hardcoded content import
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -177,7 +178,17 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+export interface SimpleEditorProps {
+  content?: JSONContent
+  onUpdate?: (content: JSONContent) => void
+  onSave?: (content: JSONContent) => void
+}
+
+export function SimpleEditor({
+  content = { type: "doc", content: [] }, // Default empty content
+  onUpdate,
+  onSave,
+}: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -195,6 +206,14 @@ export function SimpleEditor() {
         "aria-label": "Main content area, start typing to enter text.",
         class: "simple-editor",
       },
+      handleKeyDown: (view, event) => {
+        if ((event.metaKey || event.ctrlKey) && event.key === 's') {
+          event.preventDefault()
+          onSave?.(view.state.toJSON()) // Or editor.getJSON() if accessible
+          return true
+        }
+        return false
+      }
     },
     extensions: [
       StarterKit.configure({
@@ -222,8 +241,22 @@ export function SimpleEditor() {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content,
+    content: content, // Use prop content
+    onUpdate: ({ editor }) => {
+      onUpdate?.(editor.getJSON())
+    },
+
   })
+
+  // Update editor content if prop changes (optional, be careful with loops)
+  // For now we assume initialContent is sufficient or we handle it carefully
+  useEffect(() => {
+    if (editor && content && !editor.isDestroyed && editor.isEmpty) {
+      // Only set content if editor is empty to avoid overwriting user work
+      // or strictly rely on initial render. 
+      // Better: rely on initial render via proper keying in parent.
+    }
+  }, [editor, content])
 
   const rect = useCursorVisibility({
     editor,
@@ -244,8 +277,8 @@ export function SimpleEditor() {
           style={{
             ...(isMobile
               ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
+                bottom: `calc(100% - ${height - rect.y}px)`,
+              }
               : {}),
           }}
         >
