@@ -1,9 +1,9 @@
+import { useCallback, useMemo } from "react"
 import { EditorContent, type Editor } from "@tiptap/react"
 import type { PageData } from "@/lib/page-types"
-import { getSectionMenu } from "@/lib/navigation"
-import { cn } from "@/lib/utils"
-// We'll need Link from react-router-dom for sidebar navigation
-import { Link, useLocation } from "react-router-dom"
+import { getSectionMenu, normalizePath, type NavItem } from "@/lib/navigation"
+import { TreeView, type TreeDataItem } from "@/components/tree-view"
+import { useLocation, useNavigate } from "react-router-dom"
 
 interface StandardTemplateProps {
     page: PageData
@@ -12,11 +12,43 @@ interface StandardTemplateProps {
 
 export function StandardTemplate({ page, editor }: StandardTemplateProps) {
     const location = useLocation()
+    const navigate = useNavigate()
 
     // Find the sidebar menu based on current URL
     // We use location.pathname. Ideally page.slug could be used to reconstruct path,
     // but location is more direct for the navigation helper.
     const sectionMenu = getSectionMenu(location.pathname)
+    const selectedId = normalizePath(location.pathname)
+
+    type TreeNavItem = TreeDataItem & { url?: string }
+
+    const buildTreeData = useCallback(
+        (items: NavItem[], parentSlugs: string[] = []): TreeNavItem[] =>
+            items.map((item) => {
+                const slugSegment =
+                    item.slug ||
+                    item.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+                const nextSlugs = [...parentSlugs, slugSegment]
+                const isLeaf = !item.items?.length
+                const url = isLeaf ? item.url : undefined
+                const id = url ? normalizePath(url) : `node:${nextSlugs.join("/")}`
+
+                return {
+                    id,
+                    name: item.title,
+                    url,
+                    children: item.items ? buildTreeData(item.items, nextSlugs) : undefined,
+                }
+            }),
+        []
+    )
+
+    const sectionItems = useMemo(() => sectionMenu?.items ?? [], [sectionMenu])
+
+    const treeData = useMemo(
+        () => (sectionItems.length ? buildTreeData(sectionItems) : []),
+        [buildTreeData, sectionItems]
+    )
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50">
@@ -43,30 +75,22 @@ export function StandardTemplate({ page, editor }: StandardTemplateProps) {
                                 <div className="bg-primary/5 p-4 border-b border-primary/10">
                                     <h2 className="font-bold text-lg text-primary">{sectionMenu.title}</h2>
                                 </div>
-                                <nav className="p-2">
-                                    <ul className="space-y-1">
-                                        {sectionMenu.items.map((item, idx) => {
-                                            const isActive = location.pathname === item.url ||
-                                                location.pathname.endsWith(`/${item.slug}`)
-
-                                            return (
-                                                <li key={idx}>
-                                                    <Link
-                                                        to={item.url || "#"}
-                                                        className={cn(
-                                                            "block px-4 py-2.5 rounded-md text-sm font-medium transition-colors",
-                                                            isActive
-                                                                ? "bg-primary text-primary-foreground"
-                                                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                                                        )}
-                                                    >
-                                                        {item.title}
-                                                    </Link>
-                                                </li>
-                                            )
-                                        })}
-                                    </ul>
-                                </nav>
+                                <div className="p-2">
+                                    <TreeView
+                                        key={selectedId}
+                                        data={treeData}
+                                        initialSelectedItemId={selectedId}
+                                        onSelectChange={(item) => {
+                                            const target = item as TreeNavItem | undefined
+                                            if (!target?.url) return
+                                            const nextUrl = normalizePath(target.url)
+                                            if (nextUrl !== selectedId) {
+                                                navigate(target.url)
+                                            }
+                                        }}
+                                        className="p-0"
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>

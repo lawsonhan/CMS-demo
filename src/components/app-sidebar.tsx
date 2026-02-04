@@ -48,7 +48,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Quick Links (No label) */}
         <NavMain items={navigation.quickLinks} />
         {/* Main Navigation (Labeled) */}
-        <NavMain items={navigation.navMain} label="主导航" />
+        <NavMain items={navigation.navMain} label="主导航" showChildren={false} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

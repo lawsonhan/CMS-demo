@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { Navigate, useLocation, useNavigate } from "react-router-dom"
 import { usePage } from "@/hooks/use-page"
 import { PageView } from "@/components/page-view"
 import { PageEditor } from "@/components/page-editor"
 import { CMSHeader } from "@/components/cms-header"
+import { getLeafRedirect } from "@/lib/navigation"
 
 import { Edit, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -13,6 +14,17 @@ interface PageContainerProps {
 }
 
 export function PageContainer({ pageTitle }: PageContainerProps) {
+    const { pathname } = useLocation()
+    const leafRedirect = getLeafRedirect(pathname)
+
+    if (leafRedirect && leafRedirect !== pathname) {
+        return <Navigate to={leafRedirect} replace />
+    }
+
+    return <PageContainerInner pageTitle={pageTitle} />
+}
+
+function PageContainerInner({ pageTitle }: PageContainerProps) {
     const { pathname } = useLocation()
     const navigate = useNavigate()
 

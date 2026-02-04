@@ -27,7 +27,7 @@ export type NavItem = {
 
 export type BreadcrumbItem = {
   title: string
-  url: string
+  url?: string
 }
 
 const BASE_PATH = "/pages"
@@ -51,27 +51,27 @@ const quickLinks: NavItem[] = [
     url: "/contact",
     icon: Contact,
   },
-]
-
-const navMain: NavItem[] = [
   {
     title: "學校小冊子",
     slug: "school-booklet",
-    url: "#",
+    url: "/pages/school-booklet",
     icon: Book,
   },
   {
     title: "活動相片",
     slug: "activity-photos",
-    url: "#",
+    url: "/pages/activity-photos",
     icon: Image,
   },
   {
     title: "各類通告",
     slug: "announcements",
-    url: "#",
+    url: "/pages/announcements",
     icon: Bell,
   },
+]
+
+const navMain: NavItem[] = [
   {
     title: "我們的南元小",
     slug: "about-us",
@@ -292,9 +292,12 @@ const resolveNavItems = (
     // Use slug if provided, otherwise generate from title (fallback for safety)
     const itemSlug = item.slug || item.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
     const nextSlugs = [...parentSlugs, itemSlug]
-    const url =
-      item.url && item.url !== "#"
-        ? item.url
+    const hasChildren = !!item.items?.length
+    const explicitUrl = item.url && item.url !== "#"
+    const url = explicitUrl
+      ? item.url
+      : hasChildren
+        ? undefined
         : buildPath(basePath, nextSlugs)
 
     return {
@@ -322,9 +325,14 @@ const navIndex = new Map<string, BreadcrumbItem[]>()
 
 const indexItems = (items: NavItem[], parents: BreadcrumbItem[] = []) => {
   items.forEach((item) => {
-    if (!item.url) return
-    const nextTrail = [...parents, { title: item.title, url: item.url }]
-    navIndex.set(normalizePath(item.url), nextTrail)
+    const nextTrail = item.url
+      ? [...parents, { title: item.title, url: item.url }]
+      : [...parents, { title: item.title }]
+
+    if (item.url) {
+      navIndex.set(normalizePath(item.url), nextTrail)
+    }
+
     if (item.items?.length) {
       indexItems(item.items, nextTrail)
     }
@@ -430,4 +438,49 @@ export function getSectionMenu(url: string): NavItem | null {
     }
   }
   return null
+}
+
+function findNavItemBySlugPath(segments: string[], items: NavItem[]): NavItem | null {
+  if (!segments.length) return null
+  const [head, ...rest] = segments
+  const match = items.find((item) => item.slug === head)
+  if (!match) return null
+  if (rest.length === 0) return match
+  if (!match.items) return null
+  return findNavItemBySlugPath(rest, match.items)
+}
+
+function findFirstLeaf(item: NavItem): NavItem | null {
+  if (!item.items?.length) return item
+  for (const child of item.items) {
+    const found = findFirstLeaf(child)
+    if (found) return found
+  }
+  return null
+}
+
+/**
+ * If the current pathname points to a non-leaf nav node, return the first leaf URL.
+ */
+export function getLeafRedirect(pathname: string): string | null {
+  const normalized = normalizePath(pathname)
+  if (!normalized.startsWith(`${BASE_PATH}/`)) {
+    return null
+  }
+  const segments = normalized
+    .slice(BASE_PATH.length + 1)
+    .split("/")
+    .filter(Boolean)
+  if (!segments.length) return null
+
+  const found = findNavItemBySlugPath(segments, navigation.navMain)
+  if (!found || !found.items?.length) {
+    return null
+  }
+
+  const leaf = findFirstLeaf(found)
+  if (!leaf?.url) return null
+
+  const leafUrl = normalizePath(leaf.url)
+  return leafUrl === normalized ? null : leaf.url
 }

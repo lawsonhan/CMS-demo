@@ -1,6 +1,6 @@
 import { Fragment } from "react"
 import type { ReactNode } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import { getBreadcrumbs } from "@/lib/navigation"
 import {
     SidebarTrigger,
@@ -41,7 +41,7 @@ export function CMSHeader({ actions }: CMSHeaderProps) {
                                             <BreadcrumbPage>{crumb.title}</BreadcrumbPage>
                                         ) : (
                                             <BreadcrumbLink asChild>
-                                                <Link to={crumb.url}>{crumb.title}</Link>
+                                                <span>{crumb.title}</span>
                                             </BreadcrumbLink>
                                         )}
                                     </BreadcrumbItem>
