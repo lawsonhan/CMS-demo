@@ -12,6 +12,9 @@ import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { ActivityPhotosPage } from "@/pages/activity-photos-page"
+import { NoticesPage } from "@/pages/notices-page"
+import { SchoolBrochurePage } from "@/pages/school-brochure-page"
 
 import { getBreadcrumbs } from "@/lib/navigation"
 import {
@@ -141,6 +144,9 @@ export default function App() {
   const breadcrumbs = getBreadcrumbs(pathname)
   const currentTitle =
     breadcrumbs[breadcrumbs.length - 1]?.title || "主頁"
+  const brochurePath = "/pages/學校小冊子"
+  const activityPhotosPath = "/pages/活動相片"
+  const noticesPath = "/pages/各類通告"
 
   return (
     <SidebarProvider>
@@ -176,6 +182,9 @@ export default function App() {
           </Breadcrumb>
         </header>
         <Routes>
+          <Route path={brochurePath} element={<SchoolBrochurePage />} />
+          <Route path={activityPhotosPath} element={<ActivityPhotosPage />} />
+          <Route path={noticesPath} element={<NoticesPage />} />
           <Route path="*" element={<EditorPage pageTitle={currentTitle} />} />
         </Routes>
       </SidebarInset>
